@@ -28,7 +28,7 @@ namespace ServerApp
                 IPAddress localAddr = IPAddress.Parse(host);
                 server = new TcpListener(localAddr, port);
                 server.Start();
-                Console.WriteLine("Server Chat Online dang chay... Cho cac Client ket noi...");
+                Console.WriteLine("Server Chat Online đang chạy... Chờ các Client kết nối...");
 
                 int clientCount = 0;
                 while (true)
@@ -67,7 +67,8 @@ namespace ServerApp
             using (client)
             using (NetworkStream stream = client.GetStream())
             {
-                byte[] buffer = new byte[65536];
+                // Nâng kích thước buffer lên 128KB để nhận các phân đoạn dữ liệu ảnh mượt mà hơn
+                byte[] buffer = new byte[131072];
                 int bytesRead;
 
                 try
@@ -75,12 +76,59 @@ namespace ServerApp
                     while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
                     {
                         string rawMessage = Encoding.UTF8.GetString(buffer, 0, bytesRead).Trim();
-                        Console.WriteLine($"[{currentClientName} gửi lên]: {rawMessage}");
 
                         if (string.IsNullOrEmpty(rawMessage)) continue;
 
-                        // Định dạng tin nhắn từ Client thiết kế dạng -> NgườiNhận:NộiDungTinNhắn
-                        // Ví dụ: Client2:Chào bạn khỏe không
+                        // ==========================================
+                        // XỬ LÝ LOGIC CHUYỂN TIẾP ẢNH (IMAGE FORWARDING)
+                        // ==========================================
+                        if (rawMessage.StartsWith("SEND_IMAGE:"))
+                        {
+                            // Cú pháp: SEND_IMAGE:NgườiNhận:KíchThướcFile
+                            string[] parts = rawMessage.Split(':');
+                            if (parts.Length >= 3)
+                            {
+                                string targetClientName = parts[1].Trim();
+                                int imageSize = int.Parse(parts[2].Trim());
+
+                                Console.WriteLine($"[Hệ thống] {currentClientName} đang gửi dữ liệu ảnh ({imageSize} bytes) tới {targetClientName}...");
+
+                                if (_onlineClients.TryGetValue(targetClientName, out TcpClient targetClient))
+                                {
+                                    // 1. Gửi tín hiệu báo trước cho Client đích khởi tạo tiến trình nhận mảng byte ảnh
+                                    string alertMsg = $"RECEIVE_IMAGE_START:{currentClientName}:{imageSize}";
+                                    await SendToSingleClientAsync(targetClient, alertMsg);
+
+                                    // Nghỉ 150ms để luồng mạng bên nhận đồng bộ trạng thái, tránh dính gói tin
+                                    await Task.Delay(150);
+
+                                    // 2. Đọc trực tiếp dòng byte ảnh từ người gửi và pipe (đổ) thẳng sang luồng của người nhận
+                                    int totalBytesReceived = 0;
+                                    NetworkStream targetStream = targetClient.GetStream();
+
+                                    while (totalBytesReceived < imageSize)
+                                    {
+                                        int read = await stream.ReadAsync(buffer, 0, Math.Min(buffer.Length, imageSize - totalBytesReceived));
+                                        if (read == 0) break;
+
+                                        await targetStream.WriteAsync(buffer, 0, read);
+                                        totalBytesReceived += read;
+                                    }
+                                    Console.WriteLine($"[Hệ thống] Đã chuyển tiếp ảnh hoàn tất từ {currentClientName} sang {targetClientName}.");
+                                }
+                                else
+                                {
+                                    await SendToSingleClientAsync(client, $"[Hệ thống]: Không tìm thấy {targetClientName} để gửi ảnh.");
+                                }
+                            }
+                            continue;
+                        }
+
+                        // ==========================================
+                        // XỬ LÝ LOGIC CHAT VĂN BẢN TRUYỀN THỐNG
+                        // ==========================================
+                        Console.WriteLine($"[{currentClientName} gửi lên]: {rawMessage}");
+
                         int colonIndex = rawMessage.IndexOf(':');
                         if (colonIndex > 0)
                         {
