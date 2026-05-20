@@ -1,0 +1,59 @@
+## Thư mục Build và Biên dịch (Quan trọng nhất)
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Re]leasePublic/
+x64/
+x86/
+build/
+bld/
+[Bb]in/
+[Oo]bj/
+Generated%20Files/
+
+## Thư mục cấu hình của Visual Studio (.vs)
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+## Cấu hình của Rider / JetBrains
+.idea/
+*.sln.iml
+
+## Thư mục Tools và Packages của NuGet
+_ReSharper*/
+*.[Cc]r[Pp]roj
+*.userprefs
+           
+# Thư mục chứa các gói thư viện tải về
+packages/
+!packages/repositories.config
+*.nuget.props
+*.nuget.targets
+
+## File Log và báo cáo lỗi
+*.log
+*.log.*
+*.tlog
+*.log
+CrashDump*
+
+## File cấu hình cá nhân (Tránh lộ mật khẩu, Connection String)
+appsettings.Development.json
+appsettings.Local.json
+*.secrets.json
+.env
+
+## Thư mục của các môi trường Publish / Deploy
+*.[Pp]ublish.xml
+*.azurePubxml
+*.pubxml
+*.pubxml.user
+
+## Hệ điều hành rác (Mac và Windows)
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+.DS_Store

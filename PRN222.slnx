@@ -1,0 +1,8 @@
+<Solution>
+  <Project Path="ClientApp/ClientApp.csproj" Id="a208850b-ef47-4475-85b7-1639e1dce0c7" />
+  <Project Path="ClientApp2/ClientApp2.csproj" Id="6d74dc74-0b51-4bde-a6ad-ac2554229ecd" />
+  <Project Path="DatabaseFirst/DatabaseFirst.csproj" />
+  <Project Path="DNS/DNS.csproj" Id="be186cd2-e26b-4e4c-8633-6d6b3d658a37" />
+  <Project Path="PRN222/PRN222.csproj" />
+  <Project Path="ServerApp/ServerApp.csproj" Id="a1b0804b-1765-415f-958d-148216872dad" />
+</Solution>
