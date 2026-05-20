@@ -15,7 +15,7 @@ namespace ClientApp
 
             Console.InputEncoding = Encoding.UTF8;
             Console.OutputEncoding = Encoding.UTF8;
-            string serverIP = "127.0.0.1";
+            string serverIP = "26.155.50.108";
             int serverPort = 13000;
 
             try

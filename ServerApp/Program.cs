@@ -19,7 +19,7 @@ namespace ServerApp
         {
             Console.InputEncoding = Encoding.UTF8;
             Console.OutputEncoding = Encoding.UTF8;
-            string host = "127.0.0.1";
+            string host = "0.0.0.0";
             int port = 13000;
 
             TcpListener server = null;
